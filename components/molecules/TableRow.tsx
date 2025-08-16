@@ -60,6 +60,8 @@ export function TableRow({ symbol, index }: TableRowProps) {
     if (signal === "buy") return "green";
     if (signal === "sell") return "red";
     if (signal === "hold") return "yellow";
+    if (signal === "strong buy") return "green";
+    if (signal === "strong sell") return "red";
     return "gray";
   };
 
@@ -73,7 +75,19 @@ export function TableRow({ symbol, index }: TableRowProps) {
     return "gray"; // Neutral
   };
 
-  const getSignal = (symbol: CryptoSymbol): "buy" | "sell" | "hold" => {
+  const getSignal = (
+    symbol: CryptoSymbol
+  ): "buy" | "sell" | "hold" | "strong buy" | "strong sell" => {
+    //  RSI HTF > 50 + Stoch Oversold + RSI < 30 → STRONG BUY
+    if (symbol.rsiHTF > 50 && symbol.slowK < 20 && symbol.slowD < 20) {
+      return "strong buy";
+    }
+
+    // RSI HTF < 50 + Stoch Overbought + RSI > 70 → STRONG SEL
+    if (symbol.rsiHTF < 50 && symbol.slowK > 80 && symbol.slowD > 80) {
+      return "strong sell";
+    }
+
     // RSI HTF > 50 + Stoch Oversold → BUY
     if (symbol.rsiHTF > 50 && symbol.slowK < 20 && symbol.slowD < 20) {
       return "buy";
@@ -98,7 +112,7 @@ export function TableRow({ symbol, index }: TableRowProps) {
 
       <TableCell className="font-mono font-semibold">
         <a
-          href={`https://www.tradingview.com/chart/?symbol=${symbol.symbol}`}
+          href={`https://www.tradingview.com/chart/?symbol=${symbol.symbol}.P`}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -120,6 +134,10 @@ export function TableRow({ symbol, index }: TableRowProps) {
                   ? "LONG"
                   : signal === "sell"
                   ? "SHORT"
+                  : signal === "strong buy"
+                  ? "STRONG LONG"
+                  : signal === "strong sell"
+                  ? "STRONG SHORT"
                   : "HOLD"}
               </Badge>
             </div>
