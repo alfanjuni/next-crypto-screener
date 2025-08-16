@@ -4,10 +4,28 @@ import {
   fetchAllTickers,
   fetchKlineData,
   getTopUSDTPairs,
-} from '@/lib/api/binance';
-import { getLatestStochasticValues, detectStochasticCrossovers } from '@/lib/indicators/stochastic';
-import { getLatestRSI, checkRSIThreshold } from '@/lib/indicators/rsi';
-import { CryptoSymbol, ScreenerSettings, BinanceTickerResponse } from '@/lib/types';
+} from "@/lib/api/binance";
+import {
+  getLatestStochasticValues,
+  detectStochasticCrossovers,
+} from "@/lib/indicators/stochastic";
+import { getLatestRSI, checkRSIThreshold } from "@/lib/indicators/rsi";
+import {
+  CryptoSymbol,
+  ScreenerSettings,
+  BinanceTickerResponse,
+} from "@/lib/types";
+
+const timeframeMapping: Record<string, string> = {
+  "1d": "1M",
+  "12h": "2W",
+  "4h": "1W",
+  "1h": "1d",
+  "30m": "12h",
+  "15m": "4h",
+  "5m": "1h",
+  "1m": "15m",
+};
 
 /**
  * Process raw ticker data and calculate indicators
@@ -17,10 +35,15 @@ async function processSymbolData(
   settings: ScreenerSettings
 ): Promise<CryptoSymbol | null> {
   try {
+    const higherTF = timeframeMapping[settings.timeframe] || settings.timeframe;
+
     // Fetch kline data for indicators
     const klines = await fetchKlineData(ticker.symbol, settings.timeframe, 100);
-    
-    if (klines.length < 50) {
+
+    // Fetch klines for higher TF
+    const klinesHTF = await fetchKlineData(ticker.symbol, higherTF, 100);
+
+    if (klines.length < 50 || klinesHTF.length < 50) {
       return null; // Not enough data for reliable indicators
     }
 
@@ -34,6 +57,15 @@ async function processSymbolData(
 
     const rsi = getLatestRSI(klines, settings.indicators.rsi.period);
 
+    // Calculate indicators (higher TF)
+    const stochasticHTF = getLatestStochasticValues(
+      klinesHTF,
+      settings.indicators.stochastic.fastPeriod,
+      settings.indicators.stochastic.slowK,
+      settings.indicators.stochastic.slowD
+    );
+    const rsiHTF = getLatestRSI(klinesHTF, settings.indicators.rsi.period);
+
     // Check if symbol passes filters
     if (!passesIndicatorFilters(stochastic, rsi, settings)) {
       return null;
@@ -41,7 +73,8 @@ async function processSymbolData(
 
     // Calculate additional metrics
     const volume1h = parseFloat(ticker.volume) * 24; // Approximate 1h volume
-    const marketCap = parseFloat(ticker.lastPrice) * parseFloat(ticker.volume) * 365; // Rough estimate
+    const marketCap =
+      parseFloat(ticker.lastPrice) * parseFloat(ticker.volume) * 365; // Rough estimate
 
     return {
       symbol: ticker.symbol,
@@ -55,6 +88,9 @@ async function processSymbolData(
       slowK: stochastic.slowK,
       slowD: stochastic.slowD,
       rsi,
+      slowKHTF: stochasticHTF.slowK, // 👈 extra field
+      slowDHTF: stochasticHTF.slowD, // 👈 extra field
+      rsiHTF,
       ranking: 0, // Will be set after sorting
     };
   } catch (error) {
@@ -76,11 +112,11 @@ function passesIndicatorFilters(
   // Check Stochastic filter
   if (indicators.stochastic.enabled) {
     const crossDirection = indicators.stochastic.crossDirection;
-    
-    if (crossDirection === 'up' && stochastic.slowK <= stochastic.slowD) {
+
+    if (crossDirection === "up" && stochastic.slowK <= stochastic.slowD) {
       return false;
     }
-    if (crossDirection === 'down' && stochastic.slowK >= stochastic.slowD) {
+    if (crossDirection === "down" && stochastic.slowK >= stochastic.slowD) {
       return false;
     }
     // 'both' always passes
@@ -88,7 +124,13 @@ function passesIndicatorFilters(
 
   // Check RSI filter
   if (indicators.rsi.enabled) {
-    if (!checkRSIThreshold(rsi, indicators.rsi.threshold, indicators.rsi.direction)) {
+    if (
+      !checkRSIThreshold(
+        rsi,
+        indicators.rsi.threshold,
+        indicators.rsi.direction
+      )
+    ) {
       return false;
     }
   }
@@ -102,7 +144,7 @@ function passesIndicatorFilters(
 function sortSymbols(
   symbols: CryptoSymbol[],
   sortColumn: keyof CryptoSymbol,
-  sortDirection: 'asc' | 'desc'
+  sortDirection: "asc" | "desc"
 ): CryptoSymbol[] {
   return symbols.sort((a, b) => {
     const aValue = a[sortColumn];
@@ -110,13 +152,13 @@ function sortSymbols(
 
     let comparison = 0;
 
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
+    if (typeof aValue === "string" && typeof bValue === "string") {
       comparison = aValue.localeCompare(bValue);
-    } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+    } else if (typeof aValue === "number" && typeof bValue === "number") {
       comparison = aValue - bValue;
     }
 
-    return sortDirection === 'desc' ? -comparison : comparison;
+    return sortDirection === "desc" ? -comparison : comparison;
   });
 }
 
@@ -143,54 +185,60 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
   };
 }> {
   try {
-    console.log('Fetching top USDT pairs...');
+    console.log("Fetching top USDT pairs...");
     const topPairs = await getTopUSDTPairs(100);
-    
-    console.log('Fetching ticker data...');
+
+    console.log("Fetching ticker data...");
     const allTickers = await fetchAllTickers();
-    
+
     // Filter to only include our top pairs
-    const relevantTickers = allTickers.filter(ticker => 
+    const relevantTickers = allTickers.filter((ticker) =>
       topPairs.includes(ticker.symbol)
     );
 
     console.log(`Processing ${relevantTickers.length} symbols...`);
-    
+
     // Process symbols in batches to avoid rate limiting
     const batchSize = 10;
     const symbols: CryptoSymbol[] = [];
-    
+
     for (let i = 0; i < relevantTickers.length; i += batchSize) {
       const batch = relevantTickers.slice(i, i + batchSize);
-      const batchPromises = batch.map(ticker => 
+      const batchPromises = batch.map((ticker) =>
         processSymbolData(ticker, settings)
       );
-      
+
       const batchResults = await Promise.all(batchPromises);
-      const validSymbols = batchResults.filter((symbol): symbol is CryptoSymbol => 
-        symbol !== null
+      const validSymbols = batchResults.filter(
+        (symbol): symbol is CryptoSymbol => symbol !== null
       );
-      
+
       symbols.push(...validSymbols);
-      
+
       // Add small delay between batches
       if (i + batchSize < relevantTickers.length) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     }
 
     console.log(`Successfully processed ${symbols.length} symbols`);
 
     // Sort and rank symbols
-    const sortedSymbols = sortSymbols(symbols, settings.sortColumn, settings.sortDirection);
+    const sortedSymbols = sortSymbols(
+      symbols,
+      settings.sortColumn,
+      settings.sortDirection
+    );
     const rankedSymbols = addRanking(sortedSymbols);
 
     // Calculate statistics
-    const avgRSI = symbols.length > 0 ? 
-      symbols.reduce((sum, s) => sum + s.rsi, 0) / symbols.length : 0;
-    
-    const crossovers = symbols.filter(s => 
-      Math.abs(s.slowK - s.slowD) < 5 // Close to crossover
+    const avgRSI =
+      symbols.length > 0
+        ? symbols.reduce((sum, s) => sum + s.rsi, 0) / symbols.length
+        : 0;
+
+    const crossovers = symbols.filter(
+      (s) => Math.abs(s.slowK - s.slowD) < 5 // Close to crossover
     ).length;
 
     return {
@@ -203,7 +251,7 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
       },
     };
   } catch (error) {
-    console.error('Screener error:', error);
+    console.error("Screener error:", error);
     return {
       symbols: [],
       stats: {
@@ -221,24 +269,24 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
  */
 export function getDefaultSettings(): ScreenerSettings {
   return {
-    timeframe: '1h',
+    timeframe: "1m",
     indicators: {
       stochastic: {
         enabled: true,
         fastPeriod: 10,
         slowK: 5,
         slowD: 5,
-        crossDirection: 'both',
+        crossDirection: "both",
       },
       rsi: {
         enabled: true,
         period: 14,
         threshold: 50,
-        direction: 'both',
+        direction: "both",
       },
     },
-    sortColumn: 'volume24h',
-    sortDirection: 'desc',
-    refreshInterval: 60000, // 1 minute
+    sortColumn: "volume24h",
+    sortDirection: "desc",
+    refreshInterval: 180000, // 3 minute
   };
 }

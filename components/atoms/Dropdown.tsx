@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Select,
@@ -6,8 +6,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface DropdownOption {
   value: string;
@@ -32,19 +32,21 @@ export function Dropdown({
   options,
   value,
   onValueChange,
-  placeholder = 'Select...',
+  placeholder = "Select...",
   disabled = false,
   className,
 }: DropdownProps) {
   return (
     <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-      <SelectTrigger className={cn('transition-colors duration-200', className)}>
+      <SelectTrigger
+        className={cn("transition-colors duration-200", className)}
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         {options.map((option) => (
-          <SelectItem 
-            key={option.value} 
+          <SelectItem
+            key={option.value}
             value={option.value}
             disabled={option.disabled}
             className="cursor-pointer"

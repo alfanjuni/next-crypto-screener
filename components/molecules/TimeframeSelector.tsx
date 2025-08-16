@@ -10,12 +10,14 @@ interface TimeframeSelectorProps {
 }
 
 const timeframeOptions = [
-  { value: "15m", label: "15 Minutes" },
-  { value: "30m", label: "30 Minutes" },
-  { value: "1h", label: "1 Hour" },
-  { value: "4h", label: "4 Hours" },
-  { value: "12h", label: "12 Hours" },
-  { value: "1d", label: "1 Day" },
+  { value: "1m", label: "1 Minute", htfValue: "15m" },
+  { value: "5m", label: "5 Minutes", htfValue: "1h" },
+  { value: "15m", label: "15 Minutes", htfValue: "4h" },
+  { value: "30m", label: "30 Minutes", htfValue: "12h" },
+  { value: "1h", label: "1 Hour", htfValue: "1d" },
+  { value: "4h", label: "4 Hours", htfValue: "1W" },
+  { value: "12h", label: "12 Hours", htfValue: "2W" },
+  { value: "1d", label: "1 Day", htfValue: "1M" },
 ];
 
 /**
