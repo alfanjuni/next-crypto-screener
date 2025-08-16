@@ -62,6 +62,8 @@ export function TableRow({ symbol, index }: TableRowProps) {
     if (signal === "hold") return "yellow";
     if (signal === "strong buy") return "green";
     if (signal === "strong sell") return "red";
+    if (signal === "ULTRA BUY") return "green";
+    if (signal === "ULTRA SELL") return "red";
     return "gray";
   };
 
@@ -145,6 +147,10 @@ export function TableRow({ symbol, index }: TableRowProps) {
               ? "STRONG LONG"
               : symbol.signal === "strong sell"
               ? "STRONG SHORT"
+              : symbol.signal === "ULTRA BUY"
+              ? "ULTRA LONG"
+              : symbol.signal === "ULTRA SELL"
+              ? "ULTRA SHORT"
               : "HOLD"}
           </Badge>
         </div>
@@ -153,6 +159,44 @@ export function TableRow({ symbol, index }: TableRowProps) {
       <TableCell numeric colorScheme="neutral">
         ${formatPrice(symbol.price)}
       </TableCell>
+
+      <TableCell numeric>
+        <div className="flex items-center justify-end gap-2">
+          <span className="font-mono">{symbol.rsi.toFixed(2)}</span>
+          <Badge
+            variant="outline"
+            colorScheme={getRSIBadgeColor(symbol.rsi)}
+            className="text-xs"
+          >
+            RSI
+          </Badge>
+        </div>
+      </TableCell>
+      <TableCell numeric>
+        <div className="flex items-center justify-end gap-2">
+          <span className="font-mono">{symbol.rsiMTF.toFixed(2)}</span>
+          <Badge
+            variant="outline"
+            colorScheme={getRSIBadgeColor(symbol.rsiMTF)}
+            className="text-xs"
+          >
+            MTF RSI
+          </Badge>
+        </div>
+      </TableCell>
+      <TableCell numeric>
+        <div className="flex items-center justify-end gap-2">
+          <span className="font-mono">{symbol.rsiHTF.toFixed(2)}</span>
+          <Badge
+            variant="outline"
+            colorScheme={getRSIBadgeColor(symbol.rsiHTF)}
+            className="text-xs"
+          >
+            HTF RSI
+          </Badge>
+        </div>
+      </TableCell>
+
       <TableCell numeric>
         <div className="flex items-center justify-end gap-2">
           <span className="font-mono">{symbol.slowK.toFixed(2)}</span>
@@ -178,28 +222,34 @@ export function TableRow({ symbol, index }: TableRowProps) {
           </Badge>
         </div>
       </TableCell>
-
       <TableCell numeric>
         <div className="flex items-center justify-end gap-2">
-          <span className="font-mono">{symbol.rsi.toFixed(2)}</span>
+          <span className="font-mono">{symbol.slowKMTF.toFixed(2)}</span>
           <Badge
             variant="outline"
-            colorScheme={getRSIBadgeColor(symbol.rsi)}
+            colorScheme={getStochasticBadgeColor(
+              symbol.slowKMTF,
+              symbol.slowDHTF
+            )}
             className="text-xs"
           >
-            RSI
+            MTF %K
           </Badge>
         </div>
       </TableCell>
+
       <TableCell numeric>
         <div className="flex items-center justify-end gap-2">
-          <span className="font-mono">{symbol.rsiHTF.toFixed(2)}</span>
+          <span className="font-mono">{symbol.slowDMTF.toFixed(2)}</span>
           <Badge
             variant="outline"
-            colorScheme={getRSIBadgeColor(symbol.rsiHTF)}
+            colorScheme={getStochasticBadgeColor(
+              symbol.slowKMTF,
+              symbol.slowDMTF
+            )}
             className="text-xs"
           >
-            HTF RSI
+            MTF %D
           </Badge>
         </div>
       </TableCell>

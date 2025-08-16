@@ -17,7 +17,8 @@ import {
   BinanceTickerResponse,
 } from "@/lib/types";
 
-const timeframeMapping: Record<string, string> = {
+//  Mapping of timeframes to higher and medium timeframes
+const timeframeMappingMTF: Record<string, string> = {
   "1d": "1M",
   "12h": "2W",
   "4h": "1W",
@@ -28,6 +29,18 @@ const timeframeMapping: Record<string, string> = {
   "1m": "15m",
 };
 
+// Mapping of timeframes to higher timeframes
+const timeframeMappingHTF: Record<string, string> = {
+  "1d": "12M",
+  "12h": "6M",
+  "4h": "3M",
+  "1h": "1M",
+  "30m": "1M",
+  "15m": "1W",
+  "5m": "1d",
+  "1m": "4h",
+};
+
 /**
  * Process raw ticker data and calculate indicators
  */
@@ -36,7 +49,10 @@ async function processSymbolData(
   settings: ScreenerSettings
 ): Promise<CryptoSymbol | null> {
   try {
-    const higherTF = timeframeMapping[settings.timeframe] || settings.timeframe;
+    const higherTF =
+      timeframeMappingHTF[settings.timeframe] || settings.timeframe;
+    const mediumTF =
+      timeframeMappingMTF[settings.timeframe] || settings.timeframe;
 
     // Fetch kline data for indicators
     const klines = await fetchKlineData(ticker.symbol, settings.timeframe, 100);
@@ -44,7 +60,10 @@ async function processSymbolData(
     // Fetch klines for higher TF
     const klinesHTF = await fetchKlineData(ticker.symbol, higherTF, 100);
 
-    if (klines.length < 50 || klinesHTF.length < 50) {
+    // Fetch klines for medium TF
+    const klinesMTF = await fetchKlineData(ticker.symbol, mediumTF, 100);
+
+    if (klines.length < 50 || klinesHTF.length < 50 || klinesMTF.length < 50) {
       return null; // Not enough data for reliable indicators
     }
 
@@ -66,6 +85,15 @@ async function processSymbolData(
       settings.indicators.stochastic.slowD
     );
     const rsiHTF = getLatestRSI(klinesHTF, settings.indicators.rsi.period);
+
+    // Calculate indicators (medium TF)
+    const stochasticMTF = getLatestStochasticValues(
+      klinesMTF,
+      settings.indicators.stochastic.fastPeriod,
+      settings.indicators.stochastic.slowK,
+      settings.indicators.stochastic.slowD
+    );
+    const rsiMTF = getLatestRSI(klinesMTF, settings.indicators.rsi.period);
 
     // Check if symbol passes filters
     if (!passesIndicatorFilters(stochastic, rsi, settings)) {
@@ -93,6 +121,9 @@ async function processSymbolData(
       slowKHTF: stochasticHTF.slowK,
       slowDHTF: stochasticHTF.slowD,
       rsiHTF,
+      rsiMTF,
+      slowKMTF: stochasticMTF.slowK,
+      slowDMTF: stochasticMTF.slowD,
       ranking: 0, // Will be set after sorting
       signal: "hold", // placeholder, updated below
     };
@@ -295,6 +326,6 @@ export function getDefaultSettings(): ScreenerSettings {
     },
     sortColumn: "volume24h",
     sortDirection: "desc",
-    refreshInterval: 180000, // 3 minute
+    refreshInterval: 60000, // 1 minute
   };
 }

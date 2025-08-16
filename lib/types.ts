@@ -15,6 +15,9 @@ export interface CryptoSymbol {
   slowKHTF: number; // Higher TF indicators
   slowDHTF: number;
   rsiHTF: number;
+  rsiMTF: number;
+  slowKMTF: number;
+  slowDMTF: number;
   ranking: number;
   signal: string;
 }

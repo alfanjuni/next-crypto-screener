@@ -94,7 +94,33 @@ export function ScreenerTable({
               >
                 Price
               </SortableHeader>
-
+              <SortableHeader
+                column="rsi"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                RSI
+              </SortableHeader>
+              <SortableHeader
+                column="rsiMTF"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                MTF RSI
+              </SortableHeader>
+              <SortableHeader
+                column="rsiHTF"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                HTF RSI
+              </SortableHeader>
               <SortableHeader
                 column="slowK"
                 currentSort={sortColumn}
@@ -114,24 +140,24 @@ export function ScreenerTable({
               >
                 Slow %D
               </SortableHeader>
+              <SortableHeader
+                column="slowKMTF"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                MTF Slow %K
+              </SortableHeader>
 
               <SortableHeader
-                column="rsi"
+                column="slowDMTF"
                 currentSort={sortColumn}
                 sortDirection={sortDirection}
                 onSort={onSort}
                 className="text-right"
               >
-                RSI
-              </SortableHeader>
-              <SortableHeader
-                column="rsiHTF"
-                currentSort={sortColumn}
-                sortDirection={sortDirection}
-                onSort={onSort}
-                className="text-right"
-              >
-                HTF RSI
+                MTF Slow %D
               </SortableHeader>
 
               <SortableHeader
