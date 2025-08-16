@@ -35,21 +35,21 @@ export interface IndicatorSettings {
     fastPeriod: number;
     slowK: number;
     slowD: number;
-    crossDirection: 'up' | 'down' | 'both';
+    crossDirection: "up" | "down" | "both";
   };
   rsi: {
     enabled: boolean;
     period: number;
     threshold: number;
-    direction: 'above' | 'below' | 'both';
+    direction: "above" | "below" | "both";
   };
 }
 
 export interface ScreenerSettings {
-  timeframe: '15m' | '30m' | '1h' | '4h' | '12h' | '1d';
+  timeframe: "1m" | "5m" | "15m" | "30m" | "1h" | "4h" | "12h" | "1d";
   indicators: IndicatorSettings;
   sortColumn: keyof CryptoSymbol;
-  sortDirection: 'asc' | 'desc';
+  sortDirection: "asc" | "desc";
   refreshInterval: number;
 }
 

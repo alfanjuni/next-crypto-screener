@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Table,
@@ -6,16 +6,16 @@ import {
   TableHead,
   TableHeader,
   TableRow as ShadcnTableRow,
-} from '@/components/ui/table';
-import { SortableHeader } from '@/components/molecules/SortableHeader';
-import { TableRow } from '@/components/molecules/TableRow';
-import { CryptoSymbol } from '@/lib/types';
-import { Card } from '@/components/ui/card';
+} from "@/components/ui/table";
+import { SortableHeader } from "@/components/molecules/SortableHeader";
+import { TableRow } from "@/components/molecules/TableRow";
+import { CryptoSymbol } from "@/lib/types";
+import { Card } from "@/components/ui/card";
 
 interface ScreenerTableProps {
   data: CryptoSymbol[];
   sortColumn: keyof CryptoSymbol;
-  sortDirection: 'asc' | 'desc';
+  sortDirection: "asc" | "desc";
   onSort: (column: keyof CryptoSymbol) => void;
   loading?: boolean;
 }
@@ -66,7 +66,7 @@ export function ScreenerTable({
               >
                 Rank
               </SortableHeader>
-              
+
               <SortableHeader
                 column="symbol"
                 currentSort={sortColumn}
@@ -75,7 +75,16 @@ export function ScreenerTable({
               >
                 Symbol
               </SortableHeader>
-              
+              <SortableHeader
+                column="priceChangePercent24h"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                Signal
+              </SortableHeader>
+
               <SortableHeader
                 column="price"
                 currentSort={sortColumn}
@@ -85,57 +94,7 @@ export function ScreenerTable({
               >
                 Price
               </SortableHeader>
-              
-              <SortableHeader
-                column="priceChangePercent24h"
-                currentSort={sortColumn}
-                sortDirection={sortDirection}
-                onSort={onSort}
-                className="text-right"
-              >
-                24h %
-              </SortableHeader>
-              
-              <SortableHeader
-                column="volume24h"
-                currentSort={sortColumn}
-                sortDirection={sortDirection}
-                onSort={onSort}
-                className="text-right"
-              >
-                Volume 24h
-              </SortableHeader>
-              
-              <SortableHeader
-                column="volume1h"
-                currentSort={sortColumn}
-                sortDirection={sortDirection}
-                onSort={onSort}
-                className="text-right"
-              >
-                Volume 1h
-              </SortableHeader>
-              
-              <SortableHeader
-                column="marketCap"
-                currentSort={sortColumn}
-                sortDirection={sortDirection}
-                onSort={onSort}
-                className="text-right"
-              >
-                Market Cap
-              </SortableHeader>
-              
-              <SortableHeader
-                column="openInterest24h"
-                currentSort={sortColumn}
-                sortDirection={sortDirection}
-                onSort={onSort}
-                className="text-right"
-              >
-                Open Interest
-              </SortableHeader>
-              
+
               <SortableHeader
                 column="slowK"
                 currentSort={sortColumn}
@@ -145,7 +104,7 @@ export function ScreenerTable({
               >
                 Slow %K
               </SortableHeader>
-              
+
               <SortableHeader
                 column="slowD"
                 currentSort={sortColumn}
@@ -155,7 +114,7 @@ export function ScreenerTable({
               >
                 Slow %D
               </SortableHeader>
-              
+
               <SortableHeader
                 column="rsi"
                 currentSort={sortColumn}
@@ -165,16 +124,91 @@ export function ScreenerTable({
               >
                 RSI
               </SortableHeader>
+              <SortableHeader
+                column="rsi"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                HTF RSI
+              </SortableHeader>
+
+              <SortableHeader
+                column="slowK"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                HTF Slow %K
+              </SortableHeader>
+
+              <SortableHeader
+                column="slowD"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                HTF Slow %D
+              </SortableHeader>
+
+              <SortableHeader
+                column="priceChangePercent24h"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                24h %
+              </SortableHeader>
+
+              <SortableHeader
+                column="volume24h"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                Volume 24h
+              </SortableHeader>
+
+              <SortableHeader
+                column="volume1h"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                Volume 1h
+              </SortableHeader>
+
+              <SortableHeader
+                column="marketCap"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                Market Cap
+              </SortableHeader>
+
+              <SortableHeader
+                column="openInterest24h"
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={onSort}
+                className="text-right"
+              >
+                Open Interest
+              </SortableHeader>
             </ShadcnTableRow>
           </TableHeader>
-          
+
           <TableBody>
             {data.map((symbol, index) => (
-              <TableRow 
-                key={symbol.symbol} 
-                symbol={symbol} 
-                index={index}
-              />
+              <TableRow key={symbol.symbol} symbol={symbol} index={index} />
             ))}
           </TableBody>
         </Table>
