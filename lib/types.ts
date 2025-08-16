@@ -16,6 +16,7 @@ export interface CryptoSymbol {
   slowDHTF: number;
   rsiHTF: number;
   ranking: number;
+  signal: string;
 }
 
 export interface KlineData {

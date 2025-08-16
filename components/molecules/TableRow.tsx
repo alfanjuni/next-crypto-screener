@@ -75,41 +75,41 @@ export function TableRow({ symbol, index }: TableRowProps) {
     return "gray"; // Neutral
   };
 
-  const getSignal = (
-    symbol: CryptoSymbol
-  ): "buy" | "sell" | "hold" | "strong buy" | "strong sell" => {
-    //  RSI HTF > 50 + Stoch Oversold + RSI < 30 → STRONG BUY
-    if (
-      symbol.rsiHTF > 50 &&
-      symbol.slowK < 20 &&
-      symbol.slowD < 20 &&
-      symbol.rsi < 30
-    ) {
-      return "strong buy";
-    }
+  // const getSignal = (
+  //   symbol: CryptoSymbol
+  // ): "buy" | "sell" | "hold" | "strong buy" | "strong sell" => {
+  //   //  RSI HTF > 50 + Stoch Oversold + RSI < 30 → STRONG BUY
+  //   if (
+  //     symbol.rsiHTF > 50 &&
+  //     symbol.slowK < 20 &&
+  //     symbol.slowD < 20 &&
+  //     symbol.rsi < 30
+  //   ) {
+  //     return "strong buy";
+  //   }
 
-    // RSI HTF < 50 + Stoch Overbought + RSI > 70 → STRONG SEL
-    if (
-      symbol.rsiHTF < 50 &&
-      symbol.slowK > 80 &&
-      symbol.slowD > 80 &&
-      symbol.rsi > 70
-    ) {
-      return "strong sell";
-    }
+  //   // RSI HTF < 50 + Stoch Overbought + RSI > 70 → STRONG SEL
+  //   if (
+  //     symbol.rsiHTF < 50 &&
+  //     symbol.slowK > 80 &&
+  //     symbol.slowD > 80 &&
+  //     symbol.rsi > 70
+  //   ) {
+  //     return "strong sell";
+  //   }
 
-    // RSI HTF > 50 + Stoch Oversold → BUY
-    if (symbol.rsiHTF > 50 && symbol.slowK < 20 && symbol.slowD < 20) {
-      return "buy";
-    }
+  //   // RSI HTF > 50 + Stoch Oversold → BUY
+  //   if (symbol.rsiHTF > 50 && symbol.slowK < 20 && symbol.slowD < 20) {
+  //     return "buy";
+  //   }
 
-    // RSI HTF < 50 + Stoch Overbought → SELL
-    if (symbol.rsiHTF < 50 && symbol.slowK > 80 && symbol.slowD > 80) {
-      return "sell";
-    }
+  //   // RSI HTF < 50 + Stoch Overbought → SELL
+  //   if (symbol.rsiHTF < 50 && symbol.slowK > 80 && symbol.slowD > 80) {
+  //     return "sell";
+  //   }
 
-    return "hold";
-  };
+  //   return "hold";
+  // };
 
   return (
     <ShadcnTableRow
@@ -129,30 +129,25 @@ export function TableRow({ symbol, index }: TableRowProps) {
           {symbol.symbol}
         </a>
       </TableCell>
-      <TableCell numeric>
-        {(() => {
-          const signal = getSignal(symbol);
-          return (
-            <div className="flex items-center justify-end gap-2">
-              <span className="font-mono">{signal}</span>
-              <Badge
-                variant="outline"
-                colorScheme={getSignalColor(signal)}
-                className="text-xs"
-              >
-                {signal === "buy"
-                  ? "LONG"
-                  : signal === "sell"
-                  ? "SHORT"
-                  : signal === "strong buy"
-                  ? "STRONG LONG"
-                  : signal === "strong sell"
-                  ? "STRONG SHORT"
-                  : "HOLD"}
-              </Badge>
-            </div>
-          );
-        })()}
+      <TableCell>
+        <div className="flex items-center justify-end gap-2">
+          <span className="font-mono">{symbol.signal}</span>
+          <Badge
+            variant="outline"
+            colorScheme={getSignalColor(symbol.signal)}
+            className="text-xs"
+          >
+            {symbol.signal === "buy"
+              ? "LONG"
+              : symbol.signal === "sell"
+              ? "SHORT"
+              : symbol.signal === "strong buy"
+              ? "STRONG LONG"
+              : symbol.signal === "strong sell"
+              ? "STRONG SHORT"
+              : "HOLD"}
+          </Badge>
+        </div>
       </TableCell>
 
       <TableCell numeric colorScheme="neutral">

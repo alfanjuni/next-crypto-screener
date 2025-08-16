@@ -76,7 +76,7 @@ export function ScreenerTable({
                 Symbol
               </SortableHeader>
               <SortableHeader
-                column="priceChangePercent24h"
+                column="signal"
                 currentSort={sortColumn}
                 sortDirection={sortDirection}
                 onSort={onSort}
@@ -125,7 +125,7 @@ export function ScreenerTable({
                 RSI
               </SortableHeader>
               <SortableHeader
-                column="rsi"
+                column="rsiHTF"
                 currentSort={sortColumn}
                 sortDirection={sortDirection}
                 onSort={onSort}
@@ -135,7 +135,7 @@ export function ScreenerTable({
               </SortableHeader>
 
               <SortableHeader
-                column="slowK"
+                column="slowKHTF"
                 currentSort={sortColumn}
                 sortDirection={sortDirection}
                 onSort={onSort}
@@ -145,7 +145,7 @@ export function ScreenerTable({
               </SortableHeader>
 
               <SortableHeader
-                column="slowD"
+                column="slowDHTF"
                 currentSort={sortColumn}
                 sortDirection={sortDirection}
                 onSort={onSort}

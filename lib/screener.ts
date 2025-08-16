@@ -10,6 +10,7 @@ import {
   detectStochasticCrossovers,
 } from "@/lib/indicators/stochastic";
 import { getLatestRSI, checkRSIThreshold } from "@/lib/indicators/rsi";
+import { getSignal } from "@/lib/indicators/signal";
 import {
   CryptoSymbol,
   ScreenerSettings,
@@ -76,7 +77,8 @@ async function processSymbolData(
     const marketCap =
       parseFloat(ticker.lastPrice) * parseFloat(ticker.volume) * 365; // Rough estimate
 
-    return {
+    // Build the symbol object first
+    const symbolData: CryptoSymbol = {
       symbol: ticker.symbol,
       price: parseFloat(ticker.lastPrice),
       priceChange24h: parseFloat(ticker.priceChange),
@@ -88,11 +90,17 @@ async function processSymbolData(
       slowK: stochastic.slowK,
       slowD: stochastic.slowD,
       rsi,
-      slowKHTF: stochasticHTF.slowK, // 👈 extra field
-      slowDHTF: stochasticHTF.slowD, // 👈 extra field
+      slowKHTF: stochasticHTF.slowK,
+      slowDHTF: stochasticHTF.slowD,
       rsiHTF,
       ranking: 0, // Will be set after sorting
+      signal: "hold", // placeholder, updated below
     };
+
+    // Now calculate signal using the complete object
+    symbolData.signal = getSignal(symbolData);
+
+    return symbolData;
   } catch (error) {
     console.error(`Failed to process ${ticker.symbol}:`, error);
     return null;
