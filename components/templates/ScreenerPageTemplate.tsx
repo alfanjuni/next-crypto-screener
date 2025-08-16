@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { ScreenerTable } from '@/components/organisms/ScreenerTable';
-import { ScreenerSettingsPanel } from '@/components/organisms/ScreenerSettingsPanel';
-import { CryptoSymbol, ScreenerSettings } from '@/lib/types';
-import { TrendingUp, Activity, DollarSign } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from "react";
+import { ScreenerTable } from "@/components/organisms/ScreenerTable";
+import { ScreenerSettingsPanel } from "@/components/organisms/ScreenerSettingsPanel";
+import { CryptoSymbol, ScreenerSettings } from "@/lib/types";
+import { TrendingUp, Activity, DollarSign } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ScreenerPageTemplateProps {
   data: CryptoSymbol[];
@@ -21,10 +22,6 @@ interface ScreenerPageTemplateProps {
   };
 }
 
-/**
- * ScreenerPageTemplate template component
- * Main layout template for the crypto screener page
- */
 export function ScreenerPageTemplate({
   data,
   settings,
@@ -34,6 +31,12 @@ export function ScreenerPageTemplate({
   loading,
   stats,
 }: ScreenerPageTemplateProps) {
+  const [lastUpdated, setLastUpdated] = useState<string>("");
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleTimeString());
+  }, [data]); // update setiap kali data berubah
+
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       {/* Header */}
@@ -48,6 +51,7 @@ export function ScreenerPageTemplate({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Total Symbols */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Symbols</CardTitle>
@@ -55,25 +59,25 @@ export function ScreenerPageTemplate({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalSymbols}</div>
-            <p className="text-xs text-muted-foreground">
-              Tracked symbols
-            </p>
+            <p className="text-xs text-muted-foreground">Tracked symbols</p>
           </CardContent>
         </Card>
 
+        {/* Filtered Results */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Filtered Results</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Filtered Results
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.filteredSymbols}</div>
-            <p className="text-xs text-muted-foreground">
-              Match criteria
-            </p>
+            <p className="text-xs text-muted-foreground">Match criteria</p>
           </CardContent>
         </Card>
 
+        {/* Average RSI */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average RSI</CardTitle>
@@ -81,12 +85,11 @@ export function ScreenerPageTemplate({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.avgRSI.toFixed(1)}</div>
-            <p className="text-xs text-muted-foreground">
-              Market momentum
-            </p>
+            <p className="text-xs text-muted-foreground">Market momentum</p>
           </CardContent>
         </Card>
 
+        {/* Crossovers */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Crossovers</CardTitle>
@@ -94,9 +97,7 @@ export function ScreenerPageTemplate({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.crossovers}</div>
-            <p className="text-xs text-muted-foreground">
-              Stoch signals
-            </p>
+            <p className="text-xs text-muted-foreground">Stoch signals</p>
           </CardContent>
         </Card>
       </div>
@@ -121,11 +122,11 @@ export function ScreenerPageTemplate({
       {/* Footer */}
       <div className="text-center text-sm text-muted-foreground">
         <p>
-          Data provided by Binance API • Updated every {settings.refreshInterval / 1000} seconds
+          Data provided by Binance API • Updated every{" "}
+          {settings.refreshInterval / 1000} seconds
         </p>
         <p className="mt-1">
-          Timeframe: {settings.timeframe} • 
-          Last updated: {new Date().toLocaleTimeString()}
+          Timeframe: {settings.timeframe} • Last updated: {lastUpdated}
         </p>
       </div>
     </div>
