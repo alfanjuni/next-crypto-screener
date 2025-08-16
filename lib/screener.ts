@@ -16,6 +16,17 @@ import {
   BinanceTickerResponse,
 } from "@/lib/types";
 
+const timeframeMapping: Record<string, string> = {
+  "1d": "1M",
+  "12h": "2W",
+  "4h": "1W",
+  "1h": "1d",
+  "30m": "12h",
+  "15m": "4h",
+  "5m": "1h",
+  "1m": "15m",
+};
+
 /**
  * Process raw ticker data and calculate indicators
  */
@@ -24,10 +35,15 @@ async function processSymbolData(
   settings: ScreenerSettings
 ): Promise<CryptoSymbol | null> {
   try {
+    const higherTF = timeframeMapping[settings.timeframe] || settings.timeframe;
+
     // Fetch kline data for indicators
     const klines = await fetchKlineData(ticker.symbol, settings.timeframe, 100);
 
-    if (klines.length < 50) {
+    // Fetch klines for higher TF
+    const klinesHTF = await fetchKlineData(ticker.symbol, higherTF, 100);
+
+    if (klines.length < 50 || klinesHTF.length < 50) {
       return null; // Not enough data for reliable indicators
     }
 
@@ -40,6 +56,15 @@ async function processSymbolData(
     );
 
     const rsi = getLatestRSI(klines, settings.indicators.rsi.period);
+
+    // Calculate indicators (higher TF)
+    const stochasticHTF = getLatestStochasticValues(
+      klinesHTF,
+      settings.indicators.stochastic.fastPeriod,
+      settings.indicators.stochastic.slowK,
+      settings.indicators.stochastic.slowD
+    );
+    const rsiHTF = getLatestRSI(klinesHTF, settings.indicators.rsi.period);
 
     // Check if symbol passes filters
     if (!passesIndicatorFilters(stochastic, rsi, settings)) {
@@ -63,6 +88,9 @@ async function processSymbolData(
       slowK: stochastic.slowK,
       slowD: stochastic.slowD,
       rsi,
+      slowKHTF: stochasticHTF.slowK, // 👈 extra field
+      slowDHTF: stochasticHTF.slowD, // 👈 extra field
+      rsiHTF,
       ranking: 0, // Will be set after sorting
     };
   } catch (error) {
@@ -259,6 +287,6 @@ export function getDefaultSettings(): ScreenerSettings {
     },
     sortColumn: "volume24h",
     sortDirection: "desc",
-    refreshInterval: 60000, // 1 minute
+    refreshInterval: 180000, // 3 minute
   };
 }

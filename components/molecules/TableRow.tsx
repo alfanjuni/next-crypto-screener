@@ -73,6 +73,20 @@ export function TableRow({ symbol, index }: TableRowProps) {
     return "gray"; // Neutral
   };
 
+  const getSignal = (symbol: CryptoSymbol): "buy" | "sell" | "hold" => {
+    // RSI HTF > 50 + Stoch Oversold → BUY
+    if (symbol.rsiHTF > 50 && symbol.slowK < 20 && symbol.slowD < 20) {
+      return "buy";
+    }
+
+    // RSI HTF < 50 + Stoch Overbought → SELL
+    if (symbol.rsiHTF < 50 && symbol.slowK > 80 && symbol.slowD > 80) {
+      return "sell";
+    }
+
+    return "hold";
+  };
+
   return (
     <ShadcnTableRow
       className={cn(
@@ -82,18 +96,35 @@ export function TableRow({ symbol, index }: TableRowProps) {
     >
       <TableCell numeric>{symbol.ranking}</TableCell>
 
-      <TableCell className="font-mono font-semibold">{symbol.symbol}</TableCell>
+      <TableCell className="font-mono font-semibold">
+        <a
+          href={`https://www.tradingview.com/chart/?symbol=${symbol.symbol}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {symbol.symbol}
+        </a>
+      </TableCell>
       <TableCell numeric>
-        <div className="flex items-center justify-end gap-2">
-          <span className="font-mono">{"buy"}</span>
-          <Badge
-            variant="outline"
-            colorScheme={getSignalColor("buy")}
-            className="text-xs"
-          >
-            LONG
-          </Badge>
-        </div>
+        {(() => {
+          const signal = getSignal(symbol);
+          return (
+            <div className="flex items-center justify-end gap-2">
+              <span className="font-mono">{signal}</span>
+              <Badge
+                variant="outline"
+                colorScheme={getSignalColor(signal)}
+                className="text-xs"
+              >
+                {signal === "buy"
+                  ? "LONG"
+                  : signal === "sell"
+                  ? "SHORT"
+                  : "HOLD"}
+              </Badge>
+            </div>
+          );
+        })()}
       </TableCell>
 
       <TableCell numeric colorScheme="neutral">
@@ -139,39 +170,45 @@ export function TableRow({ symbol, index }: TableRowProps) {
       </TableCell>
       <TableCell numeric>
         <div className="flex items-center justify-end gap-2">
-          <span className="font-mono">{symbol.rsi.toFixed(2)}</span>
+          <span className="font-mono">{symbol.rsiHTF.toFixed(2)}</span>
           <Badge
             variant="outline"
-            colorScheme={getRSIBadgeColor(symbol.rsi)}
+            colorScheme={getRSIBadgeColor(symbol.rsiHTF)}
             className="text-xs"
           >
-            RSI
+            HTF RSI
           </Badge>
         </div>
       </TableCell>
 
       <TableCell numeric>
         <div className="flex items-center justify-end gap-2">
-          <span className="font-mono">{symbol.slowK.toFixed(2)}</span>
+          <span className="font-mono">{symbol.slowKHTF.toFixed(2)}</span>
           <Badge
             variant="outline"
-            colorScheme={getStochasticBadgeColor(symbol.slowK, symbol.slowD)}
+            colorScheme={getStochasticBadgeColor(
+              symbol.slowKHTF,
+              symbol.slowDHTF
+            )}
             className="text-xs"
           >
-            %K
+            HTF %K
           </Badge>
         </div>
       </TableCell>
 
       <TableCell numeric>
         <div className="flex items-center justify-end gap-2">
-          <span className="font-mono">{symbol.slowD.toFixed(2)}</span>
+          <span className="font-mono">{symbol.slowDHTF.toFixed(2)}</span>
           <Badge
             variant="outline"
-            colorScheme={getStochasticBadgeColor(symbol.slowK, symbol.slowD)}
+            colorScheme={getStochasticBadgeColor(
+              symbol.slowKHTF,
+              symbol.slowDHTF
+            )}
             className="text-xs"
           >
-            %D
+            HTF %D
           </Badge>
         </div>
       </TableCell>
