@@ -9,6 +9,8 @@ const ALLOWED_SIGNALS = [
   "strong sell",
   "ULTRA BUY",
   "ULTRA SELL",
+  "sell",
+  "buy",
 ];
 
 export async function sendSignalToTelegram(symbol: {
@@ -17,6 +19,7 @@ export async function sendSignalToTelegram(symbol: {
   rsi: number;
   rsiMTF: number;
   rsiHTF: number;
+  price: number;
 }) {
   try {
     // Filter signals
@@ -38,7 +41,8 @@ export async function sendSignalToTelegram(symbol: {
     const message = `
 📊 *Crypto Signal Alert*  
 ───────────────
-💎 Symbol: *${symbol.symbol}*  
+💎 Symbol: *${symbol.symbol}*
+💲 Price: ${symbol.price}
 ${icon} Direction: *${symbol.signal.toUpperCase()}*  
 🔹 RSI: ${symbol.rsi.toFixed(2)}  
 🔹 RSI MTF: ${symbol.rsiMTF.toFixed(2)}  
