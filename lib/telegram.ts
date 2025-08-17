@@ -9,8 +9,6 @@ const ALLOWED_SIGNALS = [
   "strong sell",
   "ULTRA BUY",
   "ULTRA SELL",
-  "sell",
-  "buy",
 ];
 
 export async function sendSignalToTelegram(symbol: {
