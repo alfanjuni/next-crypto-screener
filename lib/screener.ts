@@ -17,6 +17,8 @@ import {
   BinanceTickerResponse,
 } from "@/lib/types";
 
+import { sendSignalToTelegram } from "@/lib/telegram";
+
 //  Mapping of timeframes to higher and medium timeframes
 const timeframeMappingMTF: Record<string, string> = {
   "1d": "1M",
@@ -269,6 +271,12 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
       settings.sortDirection
     );
     const rankedSymbols = addRanking(sortedSymbols);
+
+    for (const s of rankedSymbols) {
+      if (s.signal !== "hold") {
+        await sendSignalToTelegram(s);
+      }
+    }
 
     // Calculate statistics
     const avgRSI =
