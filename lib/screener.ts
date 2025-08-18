@@ -33,9 +33,9 @@ const timeframeMappingMTF: Record<string, string> = {
 
 // Mapping of timeframes to higher timeframes
 const timeframeMappingHTF: Record<string, string> = {
-  "1d": "12M",
-  "12h": "6M",
-  "4h": "3M",
+  "1d": "1M",
+  "12h": "1M",
+  "4h": "1M",
   "1h": "1M",
   "30m": "1M",
   "15m": "1W",
