@@ -103,7 +103,7 @@ async function processSymbolData(
     }
 
     // Calculate additional metrics
-    const volume1h = parseFloat(ticker.volume) * 24; // Approximate 1h volume
+    const volume1h = parseFloat(ticker.volume) / 24; // Approximate 1h volume
     const marketCap =
       parseFloat(ticker.lastPrice) * parseFloat(ticker.volume) * 365; // Rough estimate
 
