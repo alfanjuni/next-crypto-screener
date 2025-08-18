@@ -56,7 +56,7 @@ export async function fetchAllTickers(): Promise<BinanceTickerResponse[]> {
 export async function fetchKlineData(
   symbol: string,
   interval: string,
-  limit: number = 50
+  limit: number = 100
 ): Promise<KlineData[]> {
   const url = `${BINANCE_BASE_URL}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
   const cacheKey = `kline-${symbol}-${interval}-${limit}`;
