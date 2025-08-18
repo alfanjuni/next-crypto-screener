@@ -57,13 +57,13 @@ async function processSymbolData(
       timeframeMappingMTF[settings.timeframe] || settings.timeframe;
 
     // Fetch kline data for indicators
-    const klines = await fetchKlineData(ticker.symbol, settings.timeframe, 100);
+    const klines = await fetchKlineData(ticker.symbol, settings.timeframe, 50);
 
     // Fetch klines for higher TF
-    const klinesHTF = await fetchKlineData(ticker.symbol, higherTF, 100);
+    const klinesHTF = await fetchKlineData(ticker.symbol, higherTF, 50);
 
     // Fetch klines for medium TF
-    const klinesMTF = await fetchKlineData(ticker.symbol, mediumTF, 100);
+    const klinesMTF = await fetchKlineData(ticker.symbol, mediumTF, 50);
 
     if (klines.length < 50 || klinesHTF.length < 50 || klinesMTF.length < 50) {
       return null; // Not enough data for reliable indicators
