@@ -5,6 +5,7 @@ import {
   BinanceKlineResponse,
   KlineData,
 } from "@/lib/types";
+import { LIGHTER_ONLY_SYMBOLS } from "@/lib/constants";
 
 const BINANCE_BASE_URL = "https://fapi.binance.com/fapi/v1";
 
@@ -91,38 +92,37 @@ export async function fetchExchangeInfo() {
 /**
  * Get top volume USDT pairs
  */
-export async function getTopUSDTPairs(limit: number = 100): Promise<string[]> {
+export async function getTopUSDTPairs(
+  limit: number = 100,
+  lighterOnly: boolean = false
+): Promise<string[]> {
   try {
     const tickers = await fetchAllTickers();
 
-    // Filter USDT pairs and sort by quote volume
-    const usdtPairs = tickers
+    let usdtPairs = tickers
       .filter((ticker) => ticker.symbol.endsWith("USDT"))
       .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
-      .slice(0, limit)
       .map((ticker) => ticker.symbol);
 
-    return usdtPairs;
+    if (lighterOnly) {
+      usdtPairs = usdtPairs.filter((s) => LIGHTER_ONLY_SYMBOLS.includes(s));
+    }
+
+    return usdtPairs.slice(0, limit);
   } catch (error) {
     console.error("Failed to fetch top USDT pairs:", error);
-    // Fallback to popular pairs
-    return [
-      "BTCUSDT",
-      "ETHUSDT",
-      "BNBUSDT",
-      "ADAUSDT",
-      "XRPUSDT",
-      "SOLUSDT",
-      "DOTUSDT",
-      "DOGEUSDT",
-      "AVAXUSDT",
-      "LINKUSDT",
-      "LTCUSDT",
-      "UNIUSDT",
-      "MATICUSDT",
-      "ALGOUSDT",
-      "ATOMUSDT",
-    ];
+    return lighterOnly
+      ? LIGHTER_ONLY_SYMBOLS
+      : [
+          "BTCUSDT",
+          "ETHUSDT",
+          "BNBUSDT",
+          "ADAUSDT",
+          "XRPUSDT",
+          "SOLUSDT",
+          "DOTUSDT",
+          "DOGEUSDT",
+        ];
   }
 }
 

@@ -227,7 +227,7 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
 }> {
   try {
     console.log("Fetching top USDT pairs...");
-    const topPairs = await getTopUSDTPairs(100);
+    const topPairs = await getTopUSDTPairs(100, settings.lighterOnly ?? false);
 
     console.log("Fetching ticker data...");
     const allTickers = await fetchAllTickers();
@@ -335,5 +335,6 @@ export function getDefaultSettings(): ScreenerSettings {
     sortColumn: "volume24h",
     sortDirection: "desc",
     refreshInterval: 60000, // 1 minute
+    lighterOnly: false, // 👈 add default
   };
 }
