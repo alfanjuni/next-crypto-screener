@@ -58,6 +58,7 @@ export interface ScreenerSettings {
   sortColumn: keyof CryptoSymbol;
   sortDirection: "asc" | "desc";
   refreshInterval: number;
+  lighterOnly?: boolean;
 }
 
 export interface BinanceTickerResponse {

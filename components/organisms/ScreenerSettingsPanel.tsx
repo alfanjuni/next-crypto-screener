@@ -1,13 +1,19 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TimeframeSelector } from '@/components/molecules/TimeframeSelector';
-import { IndicatorSettingsForm } from '@/components/molecules/IndicatorSettingsForm';
-import { Button } from '@/components/atoms/Button';
-import { ScreenerSettings } from '@/lib/types';
-import { RefreshCw, Settings } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TimeframeSelector } from "@/components/molecules/TimeframeSelector";
+import { IndicatorSettingsForm } from "@/components/molecules/IndicatorSettingsForm";
+import { Button } from "@/components/atoms/Button";
+import { ScreenerSettings } from "@/lib/types";
+import { RefreshCw, Settings } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface ScreenerSettingsPanelProps {
   settings: ScreenerSettings;
@@ -28,14 +34,16 @@ export function ScreenerSettingsPanel({
 }: ScreenerSettingsPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleTimeframeChange = (timeframe: ScreenerSettings['timeframe']) => {
+  const handleTimeframeChange = (timeframe: ScreenerSettings["timeframe"]) => {
     onSettingsChange({
       ...settings,
       timeframe,
     });
   };
 
-  const handleIndicatorSettingsChange = (indicators: ScreenerSettings['indicators']) => {
+  const handleIndicatorSettingsChange = (
+    indicators: ScreenerSettings["indicators"]
+  ) => {
     onSettingsChange({
       ...settings,
       indicators,
@@ -59,7 +67,7 @@ export function ScreenerSettingsPanel({
               onChange={handleTimeframeChange}
               disabled={isLoading}
             />
-            
+
             <Button
               onClick={onRefresh}
               loading={isLoading}
@@ -70,9 +78,21 @@ export function ScreenerSettingsPanel({
               <RefreshCw className="h-4 w-4" />
               Refresh Data
             </Button>
-            
+
             <div className="text-sm text-muted-foreground">
               Auto-refresh: {settings.refreshInterval / 1000}s
+            </div>
+
+            {/* NEW TOGGLE */}
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="lighter-only"
+                checked={settings.lighterOnly ?? false}
+                onCheckedChange={(checked) =>
+                  onSettingsChange({ ...settings, lighterOnly: checked })
+                }
+              />
+              <Label htmlFor="lighter-only">Lighter Only</Label>
             </div>
           </div>
         </CardContent>
@@ -90,12 +110,10 @@ export function ScreenerSettingsPanel({
               <Settings className="h-4 w-4" />
               Advanced Indicator Settings
             </span>
-            <span className="text-xs">
-              {isExpanded ? 'Hide' : 'Show'}
-            </span>
+            <span className="text-xs">{isExpanded ? "Hide" : "Show"}</span>
           </Button>
         </CollapsibleTrigger>
-        
+
         <CollapsibleContent className="space-y-4 pt-4">
           <IndicatorSettingsForm
             settings={settings.indicators}
