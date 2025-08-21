@@ -276,7 +276,7 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
     for (const s of rankedSymbols) {
       if (s.signal !== "hold") {
         await sendSignalToTelegram(s);
-        await sendSignalToDiscord(s);
+        await sendSignalToDiscord(s, settings);
       }
     }
 
