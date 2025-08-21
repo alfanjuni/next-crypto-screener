@@ -23,8 +23,8 @@ import { sendSignalToDiscord } from "@/lib/discord-bot";
 //  Mapping of timeframes to higher and medium timeframes
 const timeframeMappingMTF: Record<string, string> = {
   "1d": "1M",
-  "12h": "2W",
-  "4h": "1W",
+  "12h": "2w",
+  "4h": "1w",
   "1h": "1d",
   "30m": "12h",
   "15m": "4h",
@@ -39,7 +39,7 @@ const timeframeMappingHTF: Record<string, string> = {
   "4h": "1M",
   "1h": "1M",
   "30m": "1M",
-  "15m": "1W",
+  "15m": "1w",
   "5m": "1d",
   "1m": "4h",
 };
