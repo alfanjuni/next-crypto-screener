@@ -18,6 +18,7 @@ import {
 } from "@/lib/types";
 
 import { sendSignalToTelegram } from "@/lib/telegram";
+import { sendSignalToDiscord } from "@/lib/discord-bot";
 
 //  Mapping of timeframes to higher and medium timeframes
 const timeframeMappingMTF: Record<string, string> = {
@@ -275,6 +276,7 @@ export async function runScreener(settings: ScreenerSettings): Promise<{
     for (const s of rankedSymbols) {
       if (s.signal !== "hold") {
         await sendSignalToTelegram(s);
+        await sendSignalToDiscord(s, settings);
       }
     }
 
